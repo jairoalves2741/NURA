@@ -11,15 +11,13 @@
 </head>
 
 <body>
-    <script src="script.js"></script>
+
     <header>
         <div class="container header-inner">
-            <!-- Logo → vai para a Home -->
             <a href="index.php" class="logo">
                 Nura<span>.</span>
             </a>
 
-            <!-- Botão Voltar -->
             <a href="index.php" style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
                 <i class="ph-bold ph-arrow-left"></i> Voltar
             </a>
@@ -39,35 +37,40 @@
                 <button class="tab-btn" data-target="signup-form">Cadastro</button>
             </div>
 
-            <!-- LOGIN -->
             <div id="login-form" class="form-content active">
-                <form onsubmit="window.location.href='index.php?page=perfil'; return false;">
+                <form id="form-login">
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" class="input" placeholder="seu@email.com" required>
+                        <input type="email" id="input-login-email" class="input" placeholder="seu@email.com" required>
                     </div>
                     <div class="form-group">
                         <label>Senha</label>
-                        <input type="password" class="input" placeholder="••••••••" required>
+                        <input type="password" id="input-login-password" class="input" placeholder="••••••••" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Entrar</button>
                 </form>
             </div>
 
-            <!-- CADASTRO -->
             <div id="signup-form" class="form-content">
-                <form onsubmit="alert('Conta criada!'); window.location.href='index.php?page=perfil'; return false;">
+                <form id="form-cadastro">
                     <div class="form-group">
-                        <label>Nome Completo</label>
-                        <input type="text" class="input" placeholder="Seu nome" required>
+                        <label>Nome</label>
+                        <input type="text" id="input-cadastro-nome" class="input" placeholder="Seu nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sobrenome</label>
+                        <input type="text" id="input-cadastro-sobrenome" class="input" placeholder="Seu sobrenome"
+                            required>
                     </div>
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" class="input" placeholder="seu@email.com" required>
+                        <input type="email" id="input-cadastro-email" class="input" placeholder="seu@email.com"
+                            required>
                     </div>
                     <div class="form-group">
                         <label>Senha</label>
-                        <input type="password" class="input" placeholder="••••••••" required>
+                        <input type="password" id="input-cadastro-password" class="input" placeholder="••••••••"
+                            required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Criar Conta</button>
                 </form>
@@ -82,8 +85,75 @@
         </div>
     </footer>
 
+    <script src="script.js"></script>
+
+    <script type="module">
+        // Importações necessárias para o Firebase App, Auth e Firestore
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            updateDoc,
+            setDoc, // <-- AGORA IMPORTADO
+            collection,
+            query,
+            where,
+            getDoc,
+            getDocs,
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // Sua configuração web app's Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGR0TXV9bGdXPP8xm5EDr5h4M1qDQtGYY",
+            authDomain: "nura-3da07.firebaseapp.com",
+            projectId: "nura-3da07",
+            storageBucket: "nura-3da07.firebasestorage.app",
+            messagingSenderId: "542616787048",
+            appId: "1:542616787048:web:625d4f4f16d62e45eac3dd",
+            measurementId: "G-WLMM0FF9S0"
+        };
+
+        // 1. Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        // 2. Inicializa os serviços e expõe as INSTÂNCIAS e FUNÇÕES no escopo global
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+
+        // Expondo FUNÇÕES DE AUTH
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.signOut = signOut;
+
+        // Expondo funções do Firestore (CORRIGIDO: setDoc e updateDoc)
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.setDoc = setDoc; // <-- CORREÇÃO
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.getDoc = getDoc;
+        window.getDocs = getDocs;
+        window.orderBy = orderBy;
 
 
+        // 3. Conecta o estado de autenticação (loadUserData está no script.js)
+        onAuthStateChanged(window.auth, (user) => {
+            if (typeof loadUserData === 'function') {
+                loadUserData(user);
+            }
+        });
+    </script>
 </body>
 
 </html>

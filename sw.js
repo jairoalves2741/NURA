@@ -1,25 +1,33 @@
 const CACHE_NAME = "nura-cache-v1";
+
+// CORREÇÃO: Todos os caminhos agora usam o prefixo /NURA/
 const arquivosParaCache = [
-  "/",
-  "/index.php",
-  "/cadastro.php",
-  "/carrinho.php",
-  "/perfil.php",
-  "/produtos.php",
-  "/style.css",
-  "/script.js",
-  "/manifest.json",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
+  "/NURA/",
+  "/NURA/index.php",
+  "/NURA/style.css",
+  "/NURA/script.js",
+  "/NURA/manifest.json",
+  "/NURA/cadastro.php",
+  "/NURA/carrinho.php",
+  "/NURA/perfil.php",
+  "/NURA/produtos.php",
+  // Verifique a pasta dos ícones:
+  "/NURA/icons/icon-192x192.png",
+  "/NURA/icons/icon-512x512.png",
 ];
 
 self.addEventListener("install", (evento) => {
   evento.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(arquivosParaCache);
-    })
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => {
+        return cache.addAll(arquivosParaCache);
+      })
+      .catch((error) => {
+        console.error("Falha na instalação. Verifique os caminhos:", error);
+        throw error;
+      })
   );
-  // Faz o service worker ativar logo (mais simples)
   self.skipWaiting();
 });
 
@@ -30,7 +38,6 @@ self.addEventListener("activate", (evento) => {
       .then((nomesCaches) => {
         return Promise.all(
           nomesCaches.map((nome) => {
-            // Se tiver cache antigo, deleta para manter só o atual
             if (nome !== CACHE_NAME) {
               return caches.delete(nome);
             }
@@ -38,7 +45,6 @@ self.addEventListener("activate", (evento) => {
         );
       })
       .then(() => {
-        // Assume o controle das abas abertas
         self.clients.claim();
       })
   );
@@ -47,14 +53,12 @@ self.addEventListener("activate", (evento) => {
 self.addEventListener("fetch", (evento) => {
   evento.respondWith(
     caches.match(evento.request).then((resCache) => {
-      // Se achou no cache, retorna isso
       if (resCache) {
         return resCache;
       }
-      // Se não, vai na rede
       return fetch(evento.request).catch(() => {
-        // Se a rede falhar (offline), podemos retornar uma página fallback simples
-        return caches.match("/index.php");
+        // Fallback para navegação offline
+        return caches.match("/NURA/index.php");
       });
     })
   );

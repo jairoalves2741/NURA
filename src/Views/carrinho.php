@@ -4,17 +4,16 @@
 <head>
   <link rel="manifest" href="/NURA/manifest.json">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nura - Carrinho</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
-  <script src="script.js"></script>
 
   <header>
     <div class="container header-inner">
-      <!-- Logo -->
       <a href="index.php" class="logo">
         Nura<span>.</span>
       </a>
@@ -63,7 +62,6 @@
         <span>R$ 42,90</span>
       </div>
 
-      <!-- Botão de finalizar pedido → vai para login/cadastro -->
       <button class="btn btn-primary btn-full" style="margin-top: 1rem;"
         onclick="window.location.href='index.php?page=cadastro'">
         Finalizar Pedido
@@ -71,10 +69,75 @@
     </div>
   </main>
 
+  <script src="script.js"></script>
+
+  <script type="module">
+    // Importações necessárias para o Firebase App, Auth e Firestore
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      updateDoc,
+      setDoc, // <-- AGORA IMPORTADO
+      collection,
+      query,
+      where,
+      getDoc,
+      getDocs,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+    // Sua configuração web app's Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGR0TXV9bGdXPP8xm5EDr5h4M1qDQtGYY",
+      authDomain: "nura-3da07.firebaseapp.com",
+      projectId: "nura-3da07",
+      storageBucket: "nura-3da07.firebasestorage.app",
+      messagingSenderId: "542616787048",
+      appId: "1:542616787048:web:625d4f4f16d62e45eac3dd",
+      measurementId: "G-WLMM0FF9S0"
+    };
+
+    // 1. Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // 2. Inicializa os serviços e expõe as INSTÂNCIAS e FUNÇÕES no escopo global
+    window.auth = getAuth(app);
+    window.db = getFirestore(app);
+
+    // Expondo FUNÇÕES DE AUTH
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.signOut = signOut;
+
+    // Expondo funções do Firestore (CORRIGIDO: setDoc e updateDoc)
+    window.doc = doc;
+    window.updateDoc = updateDoc;
+    window.setDoc = setDoc; // <-- CORREÇÃO
+    window.collection = collection;
+    window.query = query;
+    window.where = where;
+    window.getDoc = getDoc;
+    window.getDocs = getDocs;
+    window.orderBy = orderBy;
 
 
-
-
+    // 3. Conecta o estado de autenticação (loadUserData está no script.js)
+    onAuthStateChanged(window.auth, (user) => {
+      if (typeof loadUserData === 'function') {
+        loadUserData(user);
+      }
+    });
+  </script>
 </body>
 
 </html>
