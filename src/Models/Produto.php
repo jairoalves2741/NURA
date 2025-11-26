@@ -1,4 +1,6 @@
 <?php
+// Arquivo: app/Model/Produto.php
+
 class Produto
 {
     private $id;
@@ -12,6 +14,7 @@ class Produto
         $this->preco = $preco;
     }
 
+    // Getters
     public function getId()
     {
         return $this->id;
@@ -22,14 +25,15 @@ class Produto
         return $this->nome;
     }
 
-    public function setNome($nome)
-    {
-        $this->nome = $nome;
-    }
-
     public function getPreco()
     {
         return $this->preco;
+    }
+
+    // Setters
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
     }
 
     public function setPreco($preco)
@@ -37,17 +41,7 @@ class Produto
         $this->preco = $preco;
     }
 
-    public function ExibirInfo()
-    {
-        echo "ID: $this->id, Nome: $this->nome, Preço: $this->preco";
-    }
-
-    public function ListaProdutos($produtos)
-    {
-        foreach ($produtos as $produto) {
-            $produto->ExibirInfo();
-            echo "<br>";
-        }
-    }
+    // ATENÇÃO: Os métodos ExibirInfo() e ListaProdutos() foram removidos.
+    // A View usará os getters (ex: getNome()) para montar o HTML.
 }
 ?>

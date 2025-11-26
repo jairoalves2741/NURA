@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/Usuario.php';
+// Arquivo: app/Model/Cliente.php
+require_once __DIR__ . '/Usuario.php'; // Herda da classe base Usuario
 
 class Cliente extends Usuario
 {
@@ -8,19 +9,16 @@ class Cliente extends Usuario
 
     public function __construct($id, $nome, $email, $senha, $endereco, $telefone)
     {
+        // Chama o construtor da classe pai (Usuario)
         parent::__construct($id, $nome, $email, $senha);
         $this->endereco = $endereco;
         $this->telefone = $telefone;
     }
 
+    // Getters
     public function getEndereco()
     {
         return $this->endereco;
-    }
-
-    public function setEndereco($endereco)
-    {
-        $this->endereco = $endereco;
     }
 
     public function getTelefone()
@@ -28,15 +26,18 @@ class Cliente extends Usuario
         return $this->telefone;
     }
 
+    // Setters
+    public function setEndereco($endereco)
+    {
+        $this->endereco = $endereco;
+    }
+
     public function setTelefone($telefone)
     {
         $this->telefone = $telefone;
     }
 
-    public function ExibirInfo()
-    {
-        parent::ExibirInfo();
-        echo ", Endereço: $this->endereco, Telefone: $this->telefone";
-    }
+    // ATENÇÃO: O método ExibirInfo() foi removido.
+    // A View usará os getters para montar o HTML.
 }
 ?>

@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . '/Usuario.php';
-require_once __DIR__ . '/Produto.php';
-require_once __DIR__ . '/Pedido.php';
+// Arquivo: app/Model/Administrador.php
+require_once __DIR__ . '/Usuario.php'; // Herda da classe base Usuario
 
 class Administrador extends Usuario
 {
@@ -9,24 +8,24 @@ class Administrador extends Usuario
 
     public function __construct($id, $nome, $email, $senha, $nivelAcesso)
     {
+        // Chama o construtor da classe pai (Usuario)
         parent::__construct($id, $nome, $email, $senha);
         $this->nivelAcesso = $nivelAcesso;
     }
 
+    // Getter
     public function getNivelAcesso()
     {
         return $this->nivelAcesso;
     }
 
+    // Setter
     public function setNivelAcesso($nivelAcesso)
     {
         $this->nivelAcesso = $nivelAcesso;
     }
 
-    public function ExibirInfo()
-    {
-        parent::ExibirInfo();
-        echo ", Nível de Acesso: $this->nivelAcesso<br><br>";
-    }
+    // ATENÇÃO: O método ExibirInfo() foi removido.
+    // A View usará getNivelAcesso() e os getters herdados do Usuario.
 }
 ?>

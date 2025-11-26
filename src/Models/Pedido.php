@@ -1,17 +1,22 @@
 <?php
+// Arquivo: app/Model/Pedido.php
+// Não precisa de 'require_once' para Cliente aqui, pois a injeção
+// da classe Cliente será feita no Controller/Repository.
+
 class Pedido
 {
     private $id;
     private $valorTotal;
-    private $cliente;
+    private $cliente; // Objeto da classe Cliente
 
-    public function __construct($id, $valorTotal, $cliente)
+    public function __construct($id, $valorTotal, Cliente $cliente)
     {
         $this->id = $id;
         $this->valorTotal = $valorTotal;
-        $this->cliente = $cliente;
+        $this->cliente = $cliente; // Recebe um objeto Cliente já pronto
     }
 
+    // Getters
     public function getId()
     {
         return $this->id;
@@ -22,21 +27,18 @@ class Pedido
         return $this->valorTotal;
     }
 
-    public function setValorTotal($valorTotal)
-    {
-        $this->valorTotal = $valorTotal;
-    }
-
     public function getCliente()
     {
         return $this->cliente;
     }
 
-    public function ExibirInfo()
+    // Setter
+    public function setValorTotal($valorTotal)
     {
-        echo "<p>ID do Pedido: {$this->id}<br>Valor Total: {$this->valorTotal}</p>";
-        echo "<h4>Informações do Cliente:</h4>";
-        $this->cliente->ExibirInfo();
+        $this->valorTotal = $valorTotal;
     }
+
+    // ATENÇÃO: O método ExibirInfo() foi removido.
+    // A View usará os getters para montar o HTML.
 }
 ?>
