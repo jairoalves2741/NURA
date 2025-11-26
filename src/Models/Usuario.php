@@ -1,43 +1,30 @@
 <?php
-// Arquivo: Usuario.php
+// Arquivo: src/Models/Usuario.php
+
+// AJUSTE AQUI: __DIR__ garante que ele pegue o arquivo na mesma pasta
+require_once __DIR__ . '/Database.php';
+
 class Usuario
 {
+    // ... (o resto continua igual)
+    // Atributos
     private $id;
     private $nome;
     private $email;
-    private $senha; // Deve ser sempre HASHED (criptografada) na vida real!
+    private $senha;
 
-    public function __construct($id, $nome, $email, $senha)
-    {
-        $this->id = $id;
-        $this->nome = $nome;
-        $this->email = $email;
-        $this->senha = $senha;
-    }
+    // Variável para conexão com o banco
+    private $conn;
 
-    // Getters
-    public function getId()
+    // Construtor
+    public function __construct()
     {
-        return $this->id;
-    }
-    public function getNome()
-    {
-        return $this->nome;
-    }
-    public function getEmail()
-    {
-        return $this->email;
-    }
-    public function getSenha()
-    {
-        return $this->senha;
+        // Ao criar um Usuario, ele já se conecta ao banco automaticamente
+        $database = new Database();
+        $this->conn = $database->getConnection();
     }
 
-    // Setters (mantidos para completude)
-    public function setId($id)
-    {
-        $this->id = $id; // Isso é crucial para o Repositório funcionar corretamente
-    }
+    // --- GETTERS E SETTERS (Para preencher os dados) ---
     public function setNome($nome)
     {
         $this->nome = $nome;
@@ -51,7 +38,47 @@ class Usuario
         $this->senha = $senha;
     }
 
-    // ATENÇÃO: O método ExibirInfo() com 'echo' FOI REMOVIDO!
-    // A View usará os Getters para montar o HTML.
+    public function getId()
+    {
+        return $this->id;
+    }
+    public function getNome()
+    {
+        return $this->nome;
+    }
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+
+    // --- MÉTODOS QUE MEXEM NO BANCO (Antigo Repository) ---
+
+    // Função para listar todos os usuários
+    public function listarTodos()
+    {
+        $query = "SELECT id, nome, email FROM usuarios";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna um array direto (mais fácil)
+    }
+
+    // Função para salvar este usuário
+    public function salvar()
+    {
+        $query = "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)";
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindValue(':nome', $this->nome);
+        $stmt->bindValue(':email', $this->email);
+        $stmt->bindValue(':senha', $this->senha); // Lembre-se: em produção use hash!
+
+        if ($stmt->execute()) {
+            $this->id = $this->conn->lastInsertId(); // Pega o ID que acabou de ser criado
+            return true;
+        }
+        return false;
+    }
 }
 ?>

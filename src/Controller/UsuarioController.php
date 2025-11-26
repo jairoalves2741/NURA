@@ -1,27 +1,34 @@
 <?php
-// Arquivo: UsuarioController.php (A camada Controller)
-require_once './Model/UsuarioRepository.php';
+require_once __DIR__ . '/../Models/Usuario.php';
 
 class UsuarioController
 {
-    private $usuarioRepository;
+    // ... resto do código igual ...
 
-    public function __construct()
+    public function listar()
     {
-        $this->usuarioRepository = new UsuarioRepository();
+        // Cria o modelo
+        $usuarioModel = new Usuario();
+
+        // Pede para o modelo buscar os dados
+        $lista = $usuarioModel->listarTodos();
+
+        // Retorna os dados (aqui seria onde você manda para a View ou JSON)
+        return $lista;
     }
 
-    public function listarUsuarios()
+    public function criarNovo($nome, $email, $senha)
     {
-        // O Controller chama o Repositório do Model
-        $usuarios = $this->usuarioRepository->buscarTodos();
+        $usuario = new Usuario();
+        $usuario->setNome($nome);
+        $usuario->setEmail($email);
+        $usuario->setSenha($senha);
 
-        // Agora o Controller pega a lista de objetos e a passa para a View
-
-        // include './View/lista_usuarios_view.php'; // Exemplo de chamada da View
-
-        // Aqui a View usaria um foreach para exibir $usuarios
-        return $usuarios; // A View renderiza estes dados
+        if ($usuario->salvar()) {
+            return "Usuário salvo com sucesso! ID: " . $usuario->getId();
+        } else {
+            return "Erro ao salvar.";
+        }
     }
 }
 ?>

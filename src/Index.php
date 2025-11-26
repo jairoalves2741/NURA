@@ -1,43 +1,26 @@
 <?php
-// src/index.php
+// Arquivo: src/index.php
 
-// Carregue os controladores
-require_once __DIR__ . '/Controller/AdministradorController.php';
-require_once __DIR__ . '/Controller/ClienteController.php';
-require_once __DIR__ . '/Controller/ProdutoController.php';
-require_once __DIR__ . '/Controller/PedidoController.php';
+require_once 'Controller/UsuarioController.php';
 
-// Instancie os controladores
-$admController = new AdministradorController();
-$clienteController = new ClienteController();
-$produtoController = new ProdutoController();
-$pedidoController = new PedidoController();
+// 1. Lógica de salvar (Se enviou formulário)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $controller = new UsuarioController();
+    $msg = $controller->criarNovo($_POST['nome'], $_POST['email'], $_POST['senha']);
 
-// Verifique qual página foi solicitada via parâmetro GET
-$page = isset($_GET['page']) ? $_GET['page'] : 'index'; // Padrão é 'index'
-
-// Exibir a view correspondente
-switch ($page) {
-    case 'cadastro':
-        require __DIR__ . '/Views/cadastro.php';
-        break;
-
-    case 'carrinho':
-        require __DIR__ . '/Views/carrinho.php';
-        break;
-
-    case 'perfil':
-        require __DIR__ . '/Views/perfil.php';
-        break;
-
-    case 'produtos':  // ATENÇÃO: aqui é produtos.php, não produto.php
-        require __DIR__ . '/Views/produtos.php';
-        break;
-
-    case 'index':
-    default:
-        require __DIR__ . '/Views/index.php';
-        break;
+    // Mostra mensagem simples e um botão de voltar
+    echo "<h1>$msg</h1>";
+    echo "<a href='index.php'>Voltar para Home</a>";
+    exit;
 }
 
+// 2. Lógica de Navegação (O Router)
+// Pega o que está escrito na URL (ex: index.php?pagina=cadastro)
+$pagina = isset($_GET['pagina']) ? $_GET['pagina'] : 'home';
+
+if ($pagina == 'cadastro') {
+    include 'Views/cadastro.php'; // Mostra a tela de cadastro
+} else {
+    include 'Views/home.php'; // Mostra a home (padrão)
+}
 ?>
