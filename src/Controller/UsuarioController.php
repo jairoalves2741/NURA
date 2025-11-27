@@ -3,32 +3,38 @@ require_once __DIR__ . '/../Models/Usuario.php';
 
 class UsuarioController
 {
-    // ... resto do código igual ...
 
-    public function listar()
-    {
-        // Cria o modelo
-        $usuarioModel = new Usuario();
-
-        // Pede para o modelo buscar os dados
-        $lista = $usuarioModel->listarTodos();
-
-        // Retorna os dados (aqui seria onde você manda para a View ou JSON)
-        return $lista;
-    }
-
-    public function criarNovo($nome, $email, $senha)
+    // Registrar (Cadastro)
+    public function registrar($nome, $email, $senha)
     {
         $usuario = new Usuario();
-        $usuario->setNome($nome);
-        $usuario->setEmail($email);
-        $usuario->setSenha($senha);
-
-        if ($usuario->salvar()) {
-            return "Usuário salvo com sucesso! ID: " . $usuario->getId();
-        } else {
-            return "Erro ao salvar.";
+        if ($usuario->cadastrar($nome, $email, $senha)) {
+            return "Sucesso! Faça login.";
         }
+        return "Erro: Email já existe.";
+    }
+
+    // Login
+    public function autenticar($email, $senha)
+    {
+        $usuario = new Usuario();
+        $dados = $usuario->login($email, $senha);
+
+        if ($dados) {
+            // AQUI ESTÁ A MUDANÇA: Salvamos o ID também!
+            $_SESSION['user_id'] = $dados['id'];
+            $_SESSION['user_nome'] = $dados['nome'];
+            $_SESSION['user_email'] = $dados['email'];
+            return true;
+        }
+        return false;
+    }
+
+    // NOVA FUNÇÃO: Excluir Conta
+    public function deletarUsuario($id)
+    {
+        $usuario = new Usuario();
+        return $usuario->excluir($id);
     }
 }
 ?>

@@ -1,84 +1,66 @@
 <?php
 // Arquivo: src/Models/Usuario.php
-
-// AJUSTE AQUI: __DIR__ garante que ele pegue o arquivo na mesma pasta
 require_once __DIR__ . '/Database.php';
 
 class Usuario
 {
-    // ... (o resto continua igual)
-    // Atributos
-    private $id;
-    private $nome;
-    private $email;
-    private $senha;
-
-    // Variável para conexão com o banco
     private $conn;
 
-    // Construtor
     public function __construct()
     {
-        // Ao criar um Usuario, ele já se conecta ao banco automaticamente
-        $database = new Database();
-        $this->conn = $database->getConnection();
+        $db = new Database();
+        $this->conn = $db->getConnection();
     }
 
-    // --- GETTERS E SETTERS (Para preencher os dados) ---
-    public function setNome($nome)
+    public function cadastrar($nome, $email, $senha)
     {
-        $this->nome = $nome;
-    }
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
-    public function setSenha($senha)
-    {
-        $this->senha = $senha;
+        // Criptografa a senha
+        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':nome', $nome);
+        $stmt->bindValue(':email', $email);
+        $stmt->bindValue(':senha', $senhaHash);
+
+        
+        try {
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            // Se o erro for de duplicidade (Código 23000), retorna falso
+            if ($e->getCode() == '23000') {
+                return false;
+            } else {
+                // Se for outro erro, mostra na tela
+                echo "Erro no banco: " . $e->getMessage();
+                return false;
+            }
+        }
+        // -----------------------------
     }
 
-    public function getId()
+    public function login($email, $senha)
     {
-        return $this->id;
-    }
-    public function getNome()
-    {
-        return $this->nome;
-    }
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-
-    // --- MÉTODOS QUE MEXEM NO BANCO (Antigo Repository) ---
-
-    // Função para listar todos os usuários
-    public function listarTodos()
-    {
-        $query = "SELECT id, nome, email FROM usuarios";
-        $stmt = $this->conn->prepare($query);
+        $sql = "SELECT * FROM usuarios WHERE email = :email";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':email', $email);
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Retorna um array direto (mais fácil)
-    }
-
-    // Função para salvar este usuário
-    public function salvar()
-    {
-        $query = "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindValue(':nome', $this->nome);
-        $stmt->bindValue(':email', $this->email);
-        $stmt->bindValue(':senha', $this->senha); // Lembre-se: em produção use hash!
-
-        if ($stmt->execute()) {
-            $this->id = $this->conn->lastInsertId(); // Pega o ID que acabou de ser criado
-            return true;
+        if ($stmt->rowCount() > 0) {
+            $dados = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (password_verify($senha, $dados['senha'])) {
+                return $dados;
+            }
         }
         return false;
+    }
+
+    public function excluir($id)
+    {
+        $sql = "DELETE FROM usuarios WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindValue(':id', $id);
+        return $stmt->execute();
     }
 }
 ?>
